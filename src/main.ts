@@ -8,6 +8,6 @@ async function bootstrap() {
   const config = new DocumentBuilder().setTitle('D2D Backend API').setDescription('User management APIs').setVersion('1.0').build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, document);
-  await app.listen(process.env.PORT || 3001);
+  await app.listen(process.env.PORT || 3000);
 } 
 bootstrap();
