@@ -1,19 +1,8 @@
-// import { Module } from '@nestjs/common';
-// import { AppController } from './app.controller';
-// import { AppService } from './app.service';
-    
-// @Module({
-//   imports: [],
-//   controllers: [AppController],
-//   providers: [AppService],
-// })
-// export class AppModule {}
-  
 import { Module } from '@nestjs/common';
 import { ConfigModule as NestConfigModule } from '@nestjs/config';
 import { ConfigModule } from './config/config.module';
-import { UsersModule } from './users/users.module';
 import { TasksModule } from './FieldExecutives/tasks/tasks.module';
+import { SiteAssignmentModule } from './FieldExecutives/site-assignment/site-assignment.module';
 
 @Module({
   imports: [
@@ -22,8 +11,8 @@ import { TasksModule } from './FieldExecutives/tasks/tasks.module';
       envFilePath: '.env',
     }),
     ConfigModule,
-    UsersModule,
-    TasksModule
+    TasksModule,
+    SiteAssignmentModule
   ],
 })
 export class AppModule {}
