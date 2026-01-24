@@ -57,15 +57,21 @@ export class TasksService {
     const {data, error} = await this.supabaseService.client
     .from("Tasks")
     .select('*')
-    .order('created_at', {ascending: false})
+    .order('created_at', {ascending: true})
 
     if(error){
       throw new InternalServerErrorException(error.message)
     }
 
+    const tasks = data?.map((task)=> ({
+      id: task.id,
+      taskName: task.task_name,
+      description: task.description,
+    }))
+
   return {
     count: data.length,
-    tasks: data,
+    tasks,
   };
   }
 }
