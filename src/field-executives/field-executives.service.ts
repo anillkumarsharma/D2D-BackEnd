@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { SupabaseService } from 'src/config/supabase.service';
-import { CreateTaskDto } from './dto/create-task.dto';
+import { CreateTaskDto } from './tasks/dto/create-task.dto';
 
 @Injectable()
 export class FieldExecutivesService {

@@ -1,7 +1,7 @@
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FieldExecutivesService } from './field-executives.service';
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { CreateTaskDto } from './dto/create-task.dto';
+import { CreateTaskDto } from './tasks/dto/create-task.dto';
 
 @ApiTags('Field Executives')
 @Controller('field-executives')
