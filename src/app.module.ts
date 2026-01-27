@@ -7,6 +7,7 @@ import { PagesPermissionModule } from './FieldExecutive/pages-permission/pages-p
 import { BranchesModule } from './EmployeeManagement/branches/branches.module';
 import { FeusersModule } from './FieldExecutive/feusers/feusers.module';
 import { MailApiModule } from './common/mail-api/mail-api.module';
+import { SitesModule } from './d2d-portal/sites/sites.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { MailApiModule } from './common/mail-api/mail-api.module';
     BranchesModule,
     FeusersModule,
     MailApiModule,
+    SitesModule,
     
 
   ],
