@@ -60,9 +60,6 @@ export class SiteAssignmentService {
         error.message || 'Failed to fetch sites',
       );
     }
-    return {
-      message: 'Sites feched successfully',
-      data: result,
-    };
+    return result;
   }
 }

@@ -37,7 +37,7 @@ export class SiteAssignmentController {
   @ApiResponse({ status: 400, description: 'Validation failed' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
   async getAssignSites(@Query() query: GetAssignedSiteDto) {
-   const data = this.SiteAssignmentService.GetAssignedSites(query);
+   const data =  await this.SiteAssignmentService.GetAssignedSites(query);
    return successResponse('Sites feched successfully', data);
   }
 }
