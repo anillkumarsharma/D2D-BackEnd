@@ -3,6 +3,7 @@ import { ConfigModule as NestConfigModule } from '@nestjs/config';
 import { ConfigModule } from './config/config.module';
 import { TasksModule } from './FieldExecutive/tasks/tasks.module';
 import { SiteAssignmentModule } from './FieldExecutive/site-assignment/site-assignment.module';
+import { PagesPermissionModule } from './FieldExecutive/pages-permission/pages-permission.module';
 import { BranchesModule } from './EmployeeManagement/branches/branches.module';
 import { FeusersModule } from './FieldExecutive/feusers/feusers.module';
 import { MailApiModule } from './common/mail-api/mail-api.module';
@@ -16,9 +17,11 @@ import { MailApiModule } from './common/mail-api/mail-api.module';
     ConfigModule,
     TasksModule,
     SiteAssignmentModule,
+    PagesPermissionModule,
     BranchesModule,
     FeusersModule,
-    MailApiModule
+    MailApiModule,
+    
 
   ],
 })

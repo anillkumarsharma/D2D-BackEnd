@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { SupabaseService } from 'src/config/supabase.service';
 import {
   CreateSiteAssignmentDto,
+  GetAssignedSiteDto,
   UnassignSiteDto,
 } from './dto/site-assignment.dto';
 
@@ -45,6 +46,22 @@ export class SiteAssignmentService {
     }
     return {
       message: 'Site unassigned successfully',
+      data: result,
+    };
+  }
+
+   async GetAssignedSites(data:GetAssignedSiteDto) {
+       const { data: result, error } = await this.supabaseService.client
+    .from('UserCityAccess')
+    .select('id,city_id')
+    .eq('user_id', data.userId);
+    if (error) {
+      throw new InternalServerErrorException(
+        error.message || 'Failed to fetch sites',
+      );
+    }
+    return {
+      message: 'Sites feched successfully',
       data: result,
     };
   }

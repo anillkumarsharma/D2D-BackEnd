@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SiteAssignmentService } from './site-assignment.service';
-import { CreateSiteAssignmentDto, UnassignSiteDto } from './dto/site-assignment.dto';
+import { CreateSiteAssignmentDto, GetAssignedSiteDto, UnassignSiteDto } from './dto/site-assignment.dto';
 
 @ApiTags('SiteAssignment')
 
@@ -26,6 +26,17 @@ export class SiteAssignmentController {
   @ApiResponse({ status: 500, description: 'Internal server error' })
   async unAssignSite(@Body() body: UnassignSiteDto) {
     return this.SiteAssignmentService.UnAssignSite(body);
+  }
+
+  
+  @Get('getassignedsites')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get assigned sites'})
+  @ApiResponse({ status: 200, description: 'Sites fetched successfully' })
+  @ApiResponse({ status: 400, description: 'Validation failed' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  async getAssignSites(@Query() query: GetAssignedSiteDto) {
+    return this.SiteAssignmentService.GetAssignedSites(query);
   }
 }
 

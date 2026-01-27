@@ -26,8 +26,8 @@ export class CreateSiteAssignmentDto {
   @IsNotEmpty()
   userId: string;
 }
-
-export class UnassignSiteDto  {
+ 
+export class UnassignSiteDto{
   @ApiProperty({
     example: 1,
     description: 'id',
@@ -35,4 +35,14 @@ export class UnassignSiteDto  {
   @IsInt()
   @IsNotEmpty()
   id: number;
+}
+
+export class GetAssignedSiteDto{
+  @ApiProperty({
+    example: 'd12395bf-aad8-4f3b-9716-fe6a6831b484',
+    description: 'User UUID',
+  })    
+  @IsUUID()
+  @IsNotEmpty()
+  userId: string;
 }
