@@ -4,6 +4,8 @@ import { ConfigModule } from './config/config.module';
 import { TasksModule } from './FieldExecutive/tasks/tasks.module';
 import { SiteAssignmentModule } from './FieldExecutive/site-assignment/site-assignment.module';
 import { BranchesModule } from './EmployeeManagement/branches/branches.module';
+import { FeusersModule } from './FieldExecutive/feusers/feusers.module';
+import { MailApiModule } from './common/mail-api/mail-api.module';
 
 @Module({
   imports: [
@@ -15,6 +17,9 @@ import { BranchesModule } from './EmployeeManagement/branches/branches.module';
     TasksModule,
     SiteAssignmentModule,
     BranchesModule,
+    FeusersModule,
+    MailApiModule
+
   ],
 })
-export class AppModule {}
+export class AppModule { }
