@@ -9,7 +9,7 @@ export class TasksService {
 
    async createTaskService(data:CreateTaskDto){
       const{data : result, error } = await this.supabaseService.client
-        .from('Tasks')
+        .from('FETasks')
         .insert({
           task_name: data.taskName,
           description: data.description,
@@ -38,7 +38,7 @@ export class TasksService {
     }
 
     const {data : result, error} = await this.supabaseService.client
-    .from("Tasks")
+    .from("FETasks")
     .update(updatePayload)
     .eq('id',id)
     .select()
@@ -57,7 +57,7 @@ export class TasksService {
 
   async getAllTasksService(){
     const {data, error} = await this.supabaseService.client
-    .from("Tasks")
+    .from("FETasks")
     .select('*')
     .order('created_at', {ascending: true})
 
