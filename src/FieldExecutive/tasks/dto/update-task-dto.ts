@@ -1,5 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { TaskStatus } from './create-task.dto';
 
 export class UpdateTaskDto {
   @ApiPropertyOptional({
@@ -16,4 +17,13 @@ export class UpdateTaskDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @ApiPropertyOptional({
+    example: 'inactive',
+    description: 'Updated task status',
+    enum: TaskStatus,
+  })
+  @IsOptional()
+  @IsEnum(TaskStatus)
+  status?: TaskStatus;
 }

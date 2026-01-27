@@ -13,6 +13,7 @@ export class TasksService {
         .insert({
           task_name: data.taskName,
           description: data.description,
+          status: data.status,
         })
         .select()
         .single();
@@ -30,6 +31,7 @@ export class TasksService {
 
     if (data.taskName) updatePayload.task_name = data.taskName;
     if (data.description) updatePayload.description = data.description;
+    if (data.status) updatePayload.status = data.status;
 
     if (Object.keys(updatePayload).length === 0) {
       throw new BadRequestException('No fields provided to update');
@@ -67,6 +69,7 @@ export class TasksService {
       id: task.id,
       taskName: task.task_name,
       description: task.description,
+      status: task.status,
     }))
 
   return {
