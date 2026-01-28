@@ -97,3 +97,14 @@ export class AssignSiteDto {
   @IsNotEmpty()
   assignedBy: string;
 }
+export class FELoginDto {
+  @ApiProperty({ example: '101' })
+  @IsString()
+  @IsNotEmpty()
+  userName: string;
+
+  @ApiProperty({ example: 'ABH102' })
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+}
