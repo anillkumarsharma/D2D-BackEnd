@@ -1,7 +1,8 @@
-import { ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from 'src/config/supabase.service';
 import { CreateSiteDto } from './dto/create-site.dto';
 import { getPostgresTimestamp } from 'src/common/utils/created_at.util';
+import { UpdateSiteDto } from './dto/update-site.dto';
 
 @Injectable()
 export class SitesService {
@@ -54,7 +55,6 @@ export class SitesService {
           status: body.status,
           created_by: body.created_by,
           created_at: getPostgresTimestamp(),
-          // firebase_db_path: body.firebase_db_path ?? null,
         }
       ])
       .select()
@@ -64,5 +64,55 @@ export class SitesService {
       throw new InternalServerErrorException(error.message)
     }
     return data;
+  }
+
+  async updateSiteService(siteId:number, body: UpdateSiteDto){
+    const {site_name, status,firebase_db_path} = body;
+
+    if(!siteId){
+      throw new BadRequestException('Site id is required for update');
+    }
+
+    if(site_name){
+      const{data: existing, error: checkError} = await this.supabaseService.client
+        .from('Cities')
+        .select('city_id')
+        .eq('city_name', site_name)
+        .neq('city_id', siteId)
+        .maybeSingle();
+
+      if(checkError){
+        throw new InternalServerErrorException(checkError.message);
+      }
+      if(existing){
+        throw new ConflictException('Site name already exists')
+      }
+    }
+
+    const updatePayload:any ={}
+
+    if(body.site_name !== undefined) updatePayload.city_name = site_name;
+    if(body.status !== undefined) updatePayload.status = status;
+    if(body.firebase_db_path !== undefined) updatePayload.firebase_db_path = firebase_db_path;
+
+    if (Object.keys(updatePayload).length === 0) {
+      throw new BadRequestException('No fields provided to update');
+    }
+
+    const {data: result,error} = await this.supabaseService.client
+      .from('Cities')
+      .update(updatePayload)
+      .eq("city_id",siteId)
+      .select()
+      .maybeSingle();
+
+    if(error){
+      throw new InternalServerErrorException(error.message);
+    }
+
+    if (!result) {
+      throw new NotFoundException('Site not found');
+    }
+    return result;
   }
 }
