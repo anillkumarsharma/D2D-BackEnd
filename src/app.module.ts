@@ -8,6 +8,7 @@ import { BranchesModule } from './EmployeeManagement/branches/branches.module';
 import { FeusersModule } from './FieldExecutive/feusers/feusers.module';
 import { MailApiModule } from './common/mail-api/mail-api.module';
 import { SitesModule } from './d2d-portal/sites/sites.module';
+import {FeTaskAssignmentModule} from './FieldExecutive/fe-task-assignment/fe-task-assignment.module';
 
 @Module({
   imports: [
@@ -23,8 +24,7 @@ import { SitesModule } from './d2d-portal/sites/sites.module';
     FeusersModule,
     MailApiModule,
     SitesModule,
-    
-
+    FeTaskAssignmentModule
   ],
 })
 export class AppModule { }
