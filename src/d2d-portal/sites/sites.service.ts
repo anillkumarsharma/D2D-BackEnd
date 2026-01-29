@@ -91,7 +91,7 @@ export class SitesService {
 
     const updatePayload:any ={}
 
-    if(body.site_name !== undefined) updatePayload.city_name = site_name;
+    if(body.site_name !== undefined) updatePayload.site_name = site_name;
     if(body.status !== undefined) updatePayload.status = status;
     if(body.firebase_db_path !== undefined) updatePayload.firebase_db_path = firebase_db_path;
 
