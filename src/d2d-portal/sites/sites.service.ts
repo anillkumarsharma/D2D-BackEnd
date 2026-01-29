@@ -10,7 +10,7 @@ export class SitesService {
 
   async getSitesDataService(){
     const {data, error} = await this.supabaseService.client
-    .from("Cities")
+    .from("Sites")
     .select('*')
     // 1️⃣ active first, inactive later
     .order("status", { ascending: true }) 
@@ -25,7 +25,7 @@ export class SitesService {
 
   async createNewSiteService(body: CreateSiteDto){
     const {data:existing, error:checkError} = await this.supabaseService.client
-      .from('Cities')
+      .from('Sites')
       .select('city_id, city_code, city_name')
        .or(
       `city_code.eq.${body.site_code},city_name.eq.${body.site_name}`
@@ -47,7 +47,7 @@ export class SitesService {
     }
 
     const {data,error} = await this.supabaseService.client
-      .from('Cities')
+      .from('Sites')
       .insert([
         {
           city_code: body.site_code,
@@ -75,7 +75,7 @@ export class SitesService {
 
     if(site_name){
       const{data: existing, error: checkError} = await this.supabaseService.client
-        .from('Cities')
+        .from('Sites')
         .select('city_id')
         .eq('city_name', site_name)
         .neq('city_id', siteId)
@@ -100,7 +100,7 @@ export class SitesService {
     }
 
     const {data: result,error} = await this.supabaseService.client
-      .from('Cities')
+      .from('Sites')
       .update(updatePayload)
       .eq("city_id",siteId)
       .select()

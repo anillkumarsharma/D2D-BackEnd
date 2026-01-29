@@ -50,7 +50,7 @@ export class FeusersService {
         // 2️⃣ Cities table se city details lao
         const { data: cities, error: citiesError } =
             await this.supabaseService.client
-                .from('Cities')
+                .from('Sites')
                 .select('city_id, city_name, status')
                 .in('city_id', cityIds);
 
