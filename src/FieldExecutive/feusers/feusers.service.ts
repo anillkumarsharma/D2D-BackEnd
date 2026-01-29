@@ -1,6 +1,6 @@
 import { Injectable, } from '@nestjs/common';
 import { SupabaseService } from 'src/config/supabase.service';
-import { AssignSiteDto, ChangeFEStatusDto, GetAllowedSitesDto, GetEmployeeByCodeDto, SaveFEAppAccessDto } from './dto/fe-users.dto';
+import { AssignSiteDto, ChangeFEStatusDto, FELoginDto, GetAllowedSitesDto, GetEmployeeByCodeDto, SaveFEAppAccessDto } from './dto/fe-users.dto';
 import { formatDateTime } from 'src/common/utils/response.util';
 
 import { SendFEAppAccessMailDto } from 'src/common/mail-api/dto/send-mail.dto';
@@ -96,7 +96,7 @@ export class FeusersService {
         if (error || !data) {
             return {
                 status: 'fail',
-                message: error?.message || 'Employee not found',
+                message: 'Employee not found',
                 data: null,
             };
         }
@@ -121,63 +121,87 @@ export class FeusersService {
     * Save FE App access & send credentials email
     * Author: Ritik Parmar | 27 Jan 2026
     */
-    async saveFEAppAccess(dto: SaveFEAppAccessDto) {
-        const {
-            employeeCode,
-            userName,
-            password,
-            name,
-            email,
-            mailTemplate,
-            createdBy,
-        } = dto;
-        const created_at = formatDateTime(new Date());
-        // 1️⃣ Save FE access in DB (✅ column names fixed)
-        const { data, error } = await this.supabaseService.client
-            .from('FEUsers')
-            .insert({
-                employee_code: employeeCode,
-                user_name: userName,
-                password: password,
-                created_by: createdBy,
-                created_at,
-                last_login_time: null,
-                // status will auto be 'ACTIVE'
-            })
-            .select()
-            .single();
+async saveFEAppAccess(dto: SaveFEAppAccessDto) {
+    const {
+        employeeCode,
+        userName,
+        password,
+        name,
+        email,
+        mailTemplate,
+        createdBy,
+    } = dto;
 
-        if (error) {
-            return {
-                status: 'fail',
-                message: error.message || 'Failed to save FE app access',
-                data: null,
-            };
-        }
+    // 1️⃣ Sabse pehle check karo ki kya ye employee pehle se exist karta hai?
+    const { data: existingUser, error: checkError } = await this.supabaseService.client
+        .from('FEUsers')
+        .select('employee_code')
+        .eq('employee_code', employeeCode)
+        .maybeSingle();
 
-        // 2️⃣ Prepare mail DTO
-        const mailPayload: SendFEAppAccessMailDto = {
-            to: email,
-            subject: 'Field Executive App Login Credentials',
-            template: mailTemplate,
-            data: {
-                name,
-                userName,
-                password,
-            },
-        };
-
-        // 3️⃣ Send mail
-        await this.mailApiService.sendFEAppAccessMail(mailPayload);
-
-        // 4️⃣ Final response
+    if (checkError) {
         return {
-            status: 'success',
-            message: 'FE app access created and email sent successfully',
-            data,
+            status: 'fail',
+            message: 'Error checking creating FE app access',
+            data: null,
         };
     }
 
+    // Agar user mil gaya, toh duplicate create nahi hone denge
+    if (existingUser) {
+        return {
+            status: 'fail',
+            message: `Access already exists for Employee name: ${name}`,
+            data: null,
+        };
+    }
+
+    const created_at = formatDateTime(new Date());
+
+    // 2️⃣ Naya access record save karo
+    const { data, error } = await this.supabaseService.client
+        .from('FEUsers')
+        .insert({
+            employee_code: employeeCode,
+            user_name: userName,
+            password: password,
+            created_by: createdBy,
+            created_at,
+            last_login_time: null,
+        })
+        .select()
+        .single();
+
+    if (error) {
+        return {
+            status: 'fail',
+            message: error.message || 'Failed to save FE app access',
+            data: null,
+        };
+    }
+
+    // 3️⃣ Email bhejte waqt data prepare karo
+    const mailPayload: SendFEAppAccessMailDto = {
+        to: email,
+        subject: 'Field Executive App Login Credentials',
+        template: mailTemplate,
+        data: { name, userName, password },
+    };
+
+    // 4️⃣ Mail Service ko call karo
+    await this.mailApiService.sendFEAppAccessMail(mailPayload);
+
+    // 5️⃣ Final response jisme frontend ke liye zaruri data ho
+    return {
+        status: 'success',
+        message: 'FE app access created and email sent successfully',
+        data: {
+            ...data, // DB se aaya hua data
+            employeeName: name, // Frontend table display ke liye
+            email: email       // Frontend table display ke liye
+        },
+    };
+}
     /**
    * Get Field Executive users list with name & email
    * Author: Ritik Parmar | 27 Jan 2026
@@ -323,7 +347,7 @@ export class FeusersService {
         // 2️⃣ Check existing site assignment
         const { data: existingAssignment } =
             await this.supabaseService.client
-                .from('FESiteAssignment')
+                .from('FESiteAssignments')
                 .select('id')
                 .eq('employee_code', employeeCode)
                 .maybeSingle();
@@ -334,7 +358,7 @@ export class FeusersService {
         if (!existingAssignment) {
             // First-time assignment
             const { error } = await this.supabaseService.client
-                .from('FESiteAssignment')
+                .from('FESiteAssignments')
                 .insert({
                     employee_code: employeeCode,
                     city_id: cityId,
@@ -359,7 +383,7 @@ export class FeusersService {
         } else {
             // Re-assign site
             const { error } = await this.supabaseService.client
-                .from('FESiteAssignment')
+                .from('FESiteAssignments')
                 .update({
                     city_id: cityId,
                     updated_at: formatDateTime(new Date()),
@@ -391,5 +415,77 @@ export class FeusersService {
             data: result,
         };
     }
+
+    /**
+     * Field Executive App Login
+     * Optimized & App-friendly messages
+     */
+async feLogin(dto: FELoginDto) {
+  const { userName, password } = dto;
+
+  // 1️⃣ Validate username & password
+  const { data: user } = await this.supabaseService.client
+    .from('FEUsers')
+    .select('employee_code, user_name, status')
+    .eq('user_name', userName)
+    .eq('password', password)
+    .single();
+
+  if (!user) {
+    return {
+      status: 'fail',
+      message: 'Incorrect username or password',
+      data: null,
+    };
+  }
+
+  // 2️⃣ Status check
+  if (user.status !== 'ACTIVE') {
+    return {
+      status: 'fail',
+      message: 'Your account is inactive. Please contact support.',
+      data: null,
+    };
+  }
+
+  // 3️⃣ Get employee name
+  const { data: employee } = await this.supabaseService.client
+    .from('Employees')
+    .select('employee_name')
+    .eq('employee_code', user.employee_code)
+    .maybeSingle();
+
+  // 4️⃣ Check site assignment
+  const { data: siteAssignment } = await this.supabaseService.client
+    .from('FESiteAssignments')
+    .select('city_id')
+    .eq('employee_code', user.employee_code)
+    .maybeSingle();
+
+  // 5️⃣ Update last login time (non-blocking)
+  this.supabaseService.client
+    .from('FEUsers')
+    .update({ last_login_time: new Date().toISOString() })
+    .eq('employee_code', user.employee_code);
+
+  // 6️⃣ Final response
+  return {
+    status: 'success',
+    message: siteAssignment
+      ? 'Login successful'
+      : 'Login successful. Site not assigned yet.',
+    data: {
+      employeeCode: user.employee_code,
+      userName: user.user_name,
+      employeeName: employee?.employee_name || '',
+      siteAssigned: !!siteAssignment,
+      site: siteAssignment
+        ? { siteId: siteAssignment.city_id }
+        : null,
+    },
+  };
+}
+
+
 
 }
