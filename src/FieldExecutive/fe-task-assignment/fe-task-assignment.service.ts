@@ -1,6 +1,9 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { HttpException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { SupabaseService } from 'src/config/supabase.service';
 import { FeTaskSummaryDto,FeTaskItemDto } from './dto/get-tasks-by-site.dto'
+import { AssignTaskDto } from './dto/assign-task.dto';
+import { getPostgresTimestamp } from 'src/common/utils/created_at.util';
+import { formatDateTime } from 'src/common/utils/response.util';
 
 @Injectable()
 export class FeTaskAssignmentService {
@@ -15,12 +18,20 @@ export class FeTaskAssignmentService {
     try {
       //Step 1 :  Fetch employee codes mapped to site
       const { data: feMappings, error: feMappingError } =
-        await this.supabaseService.client.from('FESiteAssignments').select('employee_code').eq('site_id', siteId);
-        if (feMappingError) {
-        this.logger.error(`Error fetching FE mappings for siteId=${siteId}`,feMappingError.message);
-        throw new InternalServerErrorException('Failed to fetch site assignments');
+        await this.supabaseService.client
+          .from('FESiteAssignments')
+          .select('employee_code')
+          .eq('site_id', siteId);
+      if (feMappingError) {
+        this.logger.error(
+          `Error fetching FE mappings for siteId=${siteId}`,
+          feMappingError.message,
+        );
+        throw new InternalServerErrorException(
+          'Failed to fetch site assignments',
+        );
       }
-      
+
       if (!feMappings || feMappings.length === 0) {
         this.logger.warn(`No Field Executives found for siteId=${siteId}`);
         return [];
@@ -31,7 +42,9 @@ export class FeTaskAssignmentService {
 
       // STEP 2: Fetch task assignments for employees
       const { data: taskRows, error: taskError } =
-        await this.supabaseService.client.from('FETaskAssignment').select(
+        await this.supabaseService.client
+          .from('FETaskAssignment')
+          .select(
             `
             id,
             employee_code,
@@ -49,8 +62,13 @@ export class FeTaskAssignmentService {
           .order('assigned_at', { ascending: false });
 
       if (taskError) {
-        this.logger.error(`Error fetching task assignments for siteId=${siteId}`,taskError.message);
-        throw new InternalServerErrorException('Failed to fetch task assignments');
+        this.logger.error(
+          `Error fetching task assignments for siteId=${siteId}`,
+          taskError.message,
+        );
+        throw new InternalServerErrorException(
+          'Failed to fetch task assignments',
+        );
       }
 
       if (!taskRows || taskRows.length === 0) {
@@ -97,8 +115,10 @@ export class FeTaskAssignmentService {
 
       const result = Object.values(summaryMap);
 
-      this.logger.log(`Successfully built task summary for siteId=${siteId}, FE count=${result.length}`);
-       return result;
+      this.logger.log(
+        `Successfully built task summary for siteId=${siteId}, FE count=${result.length}`,
+      );
+      return result;
     } catch (error) {
       this.logger.error(
         `Unhandled error while fetching tasks for siteId=${siteId}`,
@@ -106,5 +126,51 @@ export class FeTaskAssignmentService {
       );
       throw error;
     }
+  }
+
+  async assignTaskService(body: AssignTaskDto) {
+    try{
+          const {
+      task_name,
+      task_type,
+      estimation,
+      assigned_by,
+      description,
+      task_status,
+      task_id,
+      employee_code,
+    } = body;
+
+    const payload = {
+      task_name,
+      task_type,
+      estimation,
+      assigned_by,
+      assigned_at: formatDateTime(), // backend controlled
+      description,
+      task_status,
+      task_id,
+      employee_code,
+    };
+
+    const { data, error } = await this.supabaseService.client
+      .from('FETaskAssignment')
+      .insert(payload)
+      .select()
+      .maybeSingle();
+
+    if (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+    return data;
+    }catch(error){
+       if (error instanceof HttpException) {
+      throw error;
+    }
+
+    // Fallback for unexpected errors
+    throw new InternalServerErrorException(
+      error?.message || 'Something went wrong while assigning task',
+    )}
   }
 }
