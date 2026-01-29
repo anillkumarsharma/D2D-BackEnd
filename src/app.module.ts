@@ -10,6 +10,7 @@ import { MailApiModule } from './common/mail-api/mail-api.module';
 import { SitesModule } from './d2d-portal/sites/sites.module';
 import {FeTaskAssignmentModule} from './FieldExecutive/fe-task-assignment/fe-task-assignment.module';
 import { FilesModule } from './d2d-portal/files/files.module';
+import { UserManagementModule } from './d2d-portal/user-management/user-management.module';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { FilesModule } from './d2d-portal/files/files.module';
     MailApiModule,
     SitesModule,
     FeTaskAssignmentModule,
-    FilesModule
+    FilesModule,
+    UserManagementModule
   ],
 })
 export class AppModule { }

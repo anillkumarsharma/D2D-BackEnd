@@ -26,10 +26,7 @@ export class SiteAssignmentService {
         error.message || 'Failed to assign site',
       );
     }
-    return {
-      message: 'Site assigned successfully',
-      data: result,
-    };
+    return result;
   }
 
   async UnAssignSite(data: UnassignSiteDto) {
@@ -44,10 +41,8 @@ export class SiteAssignmentService {
         error.message || 'Failed to unassign site',
       );
     }
-    return {
-      message: 'Site unassigned successfully',
-      data: result,
-    };
+    return result;
+    
   }
 
    async GetAssignedSites(data:GetAssignedSiteDto) {

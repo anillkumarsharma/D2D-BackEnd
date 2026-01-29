@@ -23,10 +23,7 @@ export class PagesPermissionService {
         error.message || 'Failed to update permission',
       );
     }
-    return {
-      message: 'Permission updated successfully',
-      data: result,
-    };
+    return result;
   }
 
 
@@ -47,10 +44,7 @@ export class PagesPermissionService {
     mappedPermissions[item.access_page] = item.access_control;
   });
   
-  return {
-    message: 'Permission fetched successfully',
-    data: mappedPermissions,
-  };
+  return mappedPermissions;
 }
 
   

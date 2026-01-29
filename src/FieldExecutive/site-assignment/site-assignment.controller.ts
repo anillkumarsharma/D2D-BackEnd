@@ -16,7 +16,8 @@ export class SiteAssignmentController {
   @ApiResponse({ status: 400, description: 'Validation failed' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
   async assignSite(@Body() body: CreateSiteAssignmentDto) {
-    return this.SiteAssignmentService.AssignSite(body);
+   const data =  await  this.SiteAssignmentService.AssignSite(body);
+   return successResponse('Site assigned successfully', data);
   }
 
   @Delete('unassignsite')
@@ -26,7 +27,8 @@ export class SiteAssignmentController {
   @ApiResponse({ status: 400, description: 'Validation failed' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
   async unAssignSite(@Body() body: UnassignSiteDto) {
-    return this.SiteAssignmentService.UnAssignSite(body);
+  const data =  await  this.SiteAssignmentService.UnAssignSite(body);
+  return successResponse('Site unassigned successfully', data);
   }
 
   

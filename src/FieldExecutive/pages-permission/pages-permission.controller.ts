@@ -2,6 +2,7 @@ import { Body, Controller,Get,HttpCode, HttpStatus, Post, Query } from '@nestjs/
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PagesPermissionService } from './pages-permission.service';
 import { CreatePagesPermissionsDto, GetPagesPermissionsDto } from './dto/pages-permission.dto';
+import { successResponse } from 'src/common/utils/response.util';
 
 @ApiTags('PagesPermissions')
 
@@ -15,7 +16,8 @@ export class PagesPermissionController {
   @ApiResponse({ status: 400, description: 'Validation failed' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
   async updateAccess(@Body() body: CreatePagesPermissionsDto) {
-    return this.PagesPermissionService.updatePermission(body);
+  const data =  await this.PagesPermissionService.updatePermission(body);
+  return successResponse('Permission updated successfully', data);
   }
 
 @Get('getpermissions')
@@ -25,7 +27,8 @@ export class PagesPermissionController {
 @ApiResponse({ status: 400, description: 'Validation failed' })
 @ApiResponse({ status: 500, description: 'Internal server error' })
 async getAccess(@Query() query: GetPagesPermissionsDto) {
-  return this.PagesPermissionService.getPermission(query);
+   const data =  await this.PagesPermissionService.getPermission(query);
+  return successResponse('Permission feched successfully', data);
 }
 
 }
