@@ -49,7 +49,7 @@ export class SitesService {
       );
 
       if (codeExists && nameExists) {
-        throw new ConflictException('Site code and site name already exist');
+        throw new ConflictException('Site code and Site name already exist');
       }
       if (codeExists) {
         throw new ConflictException('Site code already exists');
