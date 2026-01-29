@@ -136,7 +136,6 @@ export class FeTaskAssignmentService {
       estimation,
       assigned_by,
       description,
-      task_status,
       task_id,
       employee_code,
     } = body;
@@ -148,7 +147,7 @@ export class FeTaskAssignmentService {
       assigned_by,
       assigned_at: formatDateTime(), // backend controlled
       description,
-      task_status,
+      task_status: 'ASSIGNED',
       task_id,
       employee_code,
     };

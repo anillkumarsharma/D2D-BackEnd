@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEnum, IsNotEmpty, IsNumber, isString, IsString } from "class-validator";
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, isString, IsString } from "class-validator";
 
 export enum TaskStatus {
   ASSIGNED = 'ASSIGNED',
@@ -63,20 +63,20 @@ export class AssignTaskDto {
     example: 'Visit Site A',
     description: 'Description of the task',
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  description: string;
+  description? : string;
 
-   @ApiProperty({
-    example: TaskStatus.ASSIGNED,
-    description: 'Status of the task',
-  })
-  @IsNotEmpty()
-  @IsEnum(TaskStatus, {
-    message:
-      'task_status must be one of ASSIGNED, ACCEPTED, IN_PROGRESS, COMPLETED, REJECTED, BLOCKED',
-  })
-  task_status: TaskStatus;
+  //  @ApiProperty({
+  //   example: TaskStatus.ASSIGNED,
+  //   description: 'Status of the task',
+  // })
+  // @IsNotEmpty()
+  // @IsEnum(TaskStatus, {
+  //   message:
+  //     'task_status must be ASSIGNED',
+  // })
+  // task_status: TaskStatus;
 
    @ApiProperty({
     example: '12',
