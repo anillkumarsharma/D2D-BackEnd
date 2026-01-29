@@ -51,8 +51,8 @@ export class FeusersService {
         const { data: cities, error: citiesError } =
             await this.supabaseService.client
                 .from('Sites')
-                .select('city_id, city_name, status')
-                .in('city_id', cityIds);
+                .select('site_id, site_name, status')
+                .in('site_id', cityIds);
 
         // ❌ Error case
         if (citiesError) {
@@ -65,8 +65,8 @@ export class FeusersService {
 
         // 3️⃣ Final response format
         const formattedData = (cities || []).map((city) => ({
-            siteId: city.city_id,
-            siteName: city.city_name,
+            siteId: city.site_id,
+            siteName: city.site_name,
             status: city.status,
         }));
 

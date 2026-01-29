@@ -15,7 +15,7 @@ export class SitesService {
     // 1️⃣ active first, inactive later
     .order("status", { ascending: true }) 
     // 2️⃣ alphabetical by city name
-    .order("city_name", { ascending: true });
+    .order("site_name", { ascending: true });
 
     if(error){
       throw new InternalServerErrorException(error.message)
@@ -26,9 +26,9 @@ export class SitesService {
   async createNewSiteService(body: CreateSiteDto){
     const {data:existing, error:checkError} = await this.supabaseService.client
       .from('Sites')
-      .select('city_id, city_code, city_name')
+      .select('site_id, site_code, site_name')
        .or(
-      `city_code.eq.${body.site_code},city_name.eq.${body.site_name}`
+      `site_code.eq.${body.site_code},site_name.eq.${body.site_name}`
       )
       .maybeSingle();
 
@@ -37,10 +37,10 @@ export class SitesService {
     }
 
     if (existing) {
-      if (existing.city_code === body.site_code) {
+      if (existing.site_code === body.site_code) {
         throw new ConflictException('Site code already exists');
       }
-      if (existing.city_name === body.site_name) {
+      if (existing.site_name === body.site_name) {
         throw new ConflictException('Site name already exists');
       }
       throw new ConflictException('Site already exists');
@@ -50,8 +50,8 @@ export class SitesService {
       .from('Sites')
       .insert([
         {
-          city_code: body.site_code,
-          city_name: body.site_name,
+          site_code: body.site_code,
+          site_name: body.site_name,
           status: body.status,
           created_by: body.created_by,
           created_at: getPostgresTimestamp(),
@@ -76,9 +76,9 @@ export class SitesService {
     if(site_name){
       const{data: existing, error: checkError} = await this.supabaseService.client
         .from('Sites')
-        .select('city_id')
-        .eq('city_name', site_name)
-        .neq('city_id', siteId)
+        .select('site_id')
+        .eq('site_name', site_name)
+        .neq('site_id', siteId)
         .maybeSingle();
 
       if(checkError){
@@ -102,7 +102,7 @@ export class SitesService {
     const {data: result,error} = await this.supabaseService.client
       .from('Sites')
       .update(updatePayload)
-      .eq("city_id",siteId)
+      .eq("site_id",siteId)
       .select()
       .maybeSingle();
 
