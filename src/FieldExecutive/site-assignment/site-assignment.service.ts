@@ -50,7 +50,7 @@ export class SiteAssignmentService {
     .from('UserCityAccess')
     .select(` id, city_id, Sites ( site_name ) `)
      .eq('user_id', data.userId);
-     console.log(result)
+     
     if (error) {
       throw new InternalServerErrorException(
         error.message || 'Failed to fetch sites',
