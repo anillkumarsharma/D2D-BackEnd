@@ -62,7 +62,7 @@ export class SiteAssignmentService {
 
       return {
         id: row.id,
-        site_id: row.city_id,
+        city_id: row.city_id,
         site_name: site?.site_name ?? null,
       };
     });
