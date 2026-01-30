@@ -48,13 +48,21 @@ export class SiteAssignmentService {
    async GetAssignedSites(data:GetAssignedSiteDto) {
        const { data: result, error } = await this.supabaseService.client
     .from('UserCityAccess')
-    .select('id,city_id')
-    .eq('user_id', data.userId);
+    .select(` id, city_id, Sites ( site_name ) `)
     if (error) {
       throw new InternalServerErrorException(
         error.message || 'Failed to fetch sites',
       );
     }
-    return result;
+    return (result || []).map((row) => {
+      const site =
+        Array.isArray(row.Sites) ? row.Sites[0] : row.Sites;
+
+      return {
+        id: row.id,
+        site_id: row.city_id,
+        site_name: site?.site_name ?? null,
+      };
+    });
   }
 }
