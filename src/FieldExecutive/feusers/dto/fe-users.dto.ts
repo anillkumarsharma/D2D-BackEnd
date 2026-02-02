@@ -87,7 +87,7 @@ export class AssignSiteDto {
   @ApiProperty({ example: 78 })
   @IsInt()
   @IsNotEmpty()
-  cityId: number;
+  siteId: number;
 
   @ApiProperty({
     example: 'd12395bf-aad8-4f3b-9716-fe6a6831b484',
@@ -107,4 +107,23 @@ export class FELoginDto {
   @IsString()
   @IsNotEmpty()
   password: string;
+}
+
+export class GetFEUsersListDto {
+  @ApiProperty({
+    example: 'd12395bf-aad8-4f3b-9716-fe6a6831b484',
+    description: 'Manager UUID to check created_by ownership',
+  })
+  @IsUUID()
+  @IsNotEmpty()
+  managerId: string;
+
+  @ApiProperty({
+    example: [78, 102, 45],
+    description: 'Array of site IDs allowed for this manager',
+    type: [Number],
+  })
+  @IsNotEmpty()
+  // Array validation ke liye (Transform handle karne ke liye @IsOptional bhi laga sakte hain agar empty allow karna ho)
+  allowedSites: number[];
 }
