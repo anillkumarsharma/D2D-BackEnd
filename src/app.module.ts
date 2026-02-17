@@ -11,6 +11,7 @@ import { SitesModule } from './d2d-portal/sites/sites.module';
 import {FeTaskAssignmentModule} from './FieldExecutive/fe-task-assignment/fe-task-assignment.module';
 import { FilesModule } from './d2d-portal/files/files.module';
 import { UserManagementModule } from './d2d-portal/user-management/user-management.module';
+import { DepartmentModule } from './EmployeeManagement/department/department.module';
 
 @Module({
   imports: [
@@ -28,7 +29,8 @@ import { UserManagementModule } from './d2d-portal/user-management/user-manageme
     SitesModule,
     FeTaskAssignmentModule,
     FilesModule,
-    UserManagementModule
+    UserManagementModule,
+    DepartmentModule
   ],
 })
 export class AppModule { }
