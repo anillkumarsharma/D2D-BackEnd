@@ -32,7 +32,7 @@ export class DesignationService {
   async getAllDesignationsByDepartment(departmentId: number) {
     const { data, error } = await this.supabaseService.client
       .from(this.tableName)
-      .select('id, department_id, name, code, status, created_at, created_by')
+      .select('id, department_id, name, created_at, created_by')
       .eq('department_id', departmentId);
 
     if (error) {
