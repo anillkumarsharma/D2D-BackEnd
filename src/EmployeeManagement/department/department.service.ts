@@ -24,7 +24,6 @@ export class DepartmentService {
       await this.supabaseService.client
         .from(this.tableName)
         .select('id')
-        .eq('branch_id', body.branch_id)
         .ilike('name', departmentName)
         .limit(1);
 
@@ -36,7 +35,7 @@ export class DepartmentService {
 
     if (existingDepartment && existingDepartment.length > 0) {
       throw new BadRequestException(
-        'Department with this name already exists in this branch',
+        'Department with this name already exists',
       );
     }
 
@@ -62,7 +61,7 @@ export class DepartmentService {
   async getAllDepartments() {
     const { data, error } = await this.supabaseService.client
       .from(this.tableName)
-      .select(` id, branch_id, name, code, status, created_at, created_by`);
+      .select(` id, name, code, status, created_at, created_by`);
 
     if (error) {
       throw new InternalServerErrorException(
@@ -76,7 +75,7 @@ export class DepartmentService {
     const { data: currentDepartment, error: currentDepartmentError } =
       await this.supabaseService.client
         .from(this.tableName)
-        .select('id, branch_id, name')
+        .select('id, name')
         .eq('id', id)
         .single();
 
@@ -92,13 +91,10 @@ export class DepartmentService {
       }
     }
 
-    const nextBranchId = updateDepartmentDto.branch_id ?? currentDepartment.branch_id;
-
     const { data: existingDepartment, error: existingDepartmentError } =
       await this.supabaseService.client
         .from(this.tableName)
         .select('id')
-        .eq('branch_id', nextBranchId)
         .ilike('name', nextDepartmentName)
         .neq('id', id)
         .limit(1);
@@ -111,7 +107,7 @@ export class DepartmentService {
 
     if (existingDepartment && existingDepartment.length > 0) {
       throw new BadRequestException(
-        'Department with this name already exists in this branch',
+        'Department with this name already exists',
       );
     }
 
