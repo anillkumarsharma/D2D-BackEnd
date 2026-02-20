@@ -16,8 +16,12 @@ export class DepartmentService {
 
   async saveDepartment(body: CreateDepartmentDto) {
     const departmentName = body.name?.trim();
+    const departmentCode = body.code?.trim();
     if (!departmentName) {
       throw new BadRequestException('Department name is required');
+    }
+    if (!departmentCode) {
+      throw new BadRequestException('Department code is required');
     }
 
     const { data: existingDepartment, error: existingDepartmentError } =
@@ -39,9 +43,29 @@ export class DepartmentService {
       );
     }
 
+    const { data: existingDepartmentCode, error: existingDepartmentCodeError } =
+      await this.supabaseService.client
+        .from(this.tableName)
+        .select('id')
+        .ilike('code', departmentCode)
+        .limit(1);
+
+    if (existingDepartmentCodeError) {
+      throw new InternalServerErrorException(
+        existingDepartmentCodeError.message || 'Failed to validate department code',
+      );
+    }
+
+    if (existingDepartmentCode && existingDepartmentCode.length > 0) {
+      throw new BadRequestException(
+        'Department with this code already exists',
+      );
+    }
+
     const payload = {
       ...body,
       name: departmentName,
+      code: departmentCode,
       created_at: new Date().toISOString(),
     };
 
@@ -75,7 +99,7 @@ export class DepartmentService {
     const { data: currentDepartment, error: currentDepartmentError } =
       await this.supabaseService.client
         .from(this.tableName)
-        .select('id, name')
+        .select('id, name, code')
         .eq('id', id)
         .single();
 
@@ -84,10 +108,17 @@ export class DepartmentService {
     }
 
     let nextDepartmentName = currentDepartment.name;
+    let nextDepartmentCode = currentDepartment.code;
     if (updateDepartmentDto.name !== undefined) {
       nextDepartmentName = updateDepartmentDto.name?.trim();
       if (!nextDepartmentName) {
         throw new BadRequestException('Department name is required');
+      }
+    }
+    if (updateDepartmentDto.code !== undefined) {
+      nextDepartmentCode = updateDepartmentDto.code?.trim();
+      if (!nextDepartmentCode) {
+        throw new BadRequestException('Department code is required');
       }
     }
 
@@ -111,12 +142,35 @@ export class DepartmentService {
       );
     }
 
+    const { data: existingDepartmentCode, error: existingDepartmentCodeError } =
+      await this.supabaseService.client
+        .from(this.tableName)
+        .select('id')
+        .ilike('code', nextDepartmentCode)
+        .neq('id', id)
+        .limit(1);
+
+    if (existingDepartmentCodeError) {
+      throw new InternalServerErrorException(
+        existingDepartmentCodeError.message || 'Failed to validate department code',
+      );
+    }
+
+    if (existingDepartmentCode && existingDepartmentCode.length > 0) {
+      throw new BadRequestException(
+        'Department with this code already exists',
+      );
+    }
+
     const payload = {
       ...updateDepartmentDto,
       updated_at: new Date().toISOString(),
     };
     if (updateDepartmentDto.name !== undefined) {
       payload.name = nextDepartmentName;
+    }
+    if (updateDepartmentDto.code !== undefined) {
+      payload.code = nextDepartmentCode;
     }
 
     const { data, error } = await this.supabaseService.client
